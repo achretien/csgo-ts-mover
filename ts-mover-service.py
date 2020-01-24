@@ -57,17 +57,17 @@ def move_to(steam_ids, ts_cid):
                 logger.warning('Need TS mapping for steam id: %s', steam_id)
                 continue
             cluid = steam_to_ts_mapping[steam_id]
-            clid_result = ts3conn.clientgetids(cluid=cluid)
-            if not clid_result:
+            try:
+                clid_result = ts3conn.clientgetids(cluid=cluid)
+                clid = clid_result[0]['clid']
+                info = ts3conn.clientinfo(clid=clid)[0]
+                if info['cid'] != ts_cid:
+                    nickname = info['client_nickname']
+                    logger.info('Moving %s to other channel', nickname)
+                    ts3conn.clientmove(cid=ts_cid, clid=clid)
+            except ts3.query.TS3QueryError as e:
                 logger.warning('Did not find active client for cluid %s. Not logged in?', cluid)
                 continue
-            clid = clid_result[0]['clid']
-            info = ts3conn.clientinfo(clid=clid)[0]
-            if info['cid'] != ts_cid:
-                nickname = info['client_nickname']
-                logger.info('Moving %s to other channel', nickname)
-                ts3conn.clientmove(cid=ts_cid, clid=clid)
-
 
 @app.route("/teams", methods=['POST'])
 def update():
