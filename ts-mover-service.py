@@ -25,7 +25,7 @@ dictConfig({
 logger = logging.getLogger(__name__)
 
 with open('ts-mover-service-config.yaml') as config_file:
-    config = yaml.load(config_file)
+    config = yaml.load(config_file, Loader=yaml.FullLoader)
 
 def init_ts3_conn(ts3conn):
     try:
